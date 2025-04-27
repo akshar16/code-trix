@@ -525,7 +525,12 @@ template = pn.template.FastListTemplate(
     accent_base_color="#0C5DA5",
     header_background="#0C5DA5",
 )
+<<<<<<< HEAD
 
 
 template.servable()
 pn.serve(template)
+=======
+template.servable()
+pn.serve(template)
+>>>>>>> 7ef27d4f (Initial commit)
