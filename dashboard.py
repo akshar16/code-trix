@@ -525,7 +525,4 @@ template = pn.template.FastListTemplate(
     accent_base_color="#0C5DA5",
     header_background="#0C5DA5",
 )
-
-if __name__ == "__main__":
     template.servable()
-    pn.serve(template)
