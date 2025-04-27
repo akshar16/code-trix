@@ -1,0 +1,6 @@
+runtime: python39  # Use Python 3.9 runtime
+entrypoint: panel serve dashboard.py --address=0.0.0.0 --port=$PORT --allow-websocket-origin="*"
+
+handlers:
+- url: /.*
+  script: auto
