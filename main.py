@@ -526,6 +526,6 @@ template = pn.template.FastListTemplate(
     header_background="#0C5DA5",
 )
 
-if __name__ == "__main__":
-    template.servable()
-    pn.serve(template)
+
+template.servable()
+pn.serve(template)
