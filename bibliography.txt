@@ -1,0 +1,25 @@
+Source 1:
+Name: Our World in Data – CO₂ and Greenhouse Gas Emissions Dataset
+Link: https://github.com/owid/co2-data
+Description: 
+This dataset includes global data on carbon dioxide emissions, GDP, population, and energy consumption from 1750 onwards, collected and maintained 
+by researchers at Our World in Data.
+
+Source 2:
+Name: Berkeley Earth – Global Land Temperatures by Country
+Link: https://berkeleyearth.org/data/
+Description: 
+Provides historical temperature data by country, dating back to 1743, compiled by climate scientists at the Berkeley Earth Surface Temperature Project.
+
+Source 3:
+Name: Kaggle – Global Land Temperatures by Country (Adapted version)
+Link: https://www.kaggle.com/datasets/vijayvvenkitesh/global-land-temperatures-by-country
+Description: 
+A Kaggle-hosted version of the Berkeley Earth dataset, restructured for ease of use in data science and machine learning projects.
+
+Source 4:
+Name: Carbon Intensity Estimates (Based on IPCC Global Averages)
+Link: https://www.ipcc.ch/report/ar6/wg3/
+Description: 
+Approximate global average carbon emissions (in gCO₂/kWh) for various energy sources such as coal, oil, natural gas, solar, wind, and nuclear,
+as reported by the Intergovernmental Panel on Climate Change (IPCC) in their Sixth Assessment Report (AR6).

@@ -22,33 +22,28 @@ try:
 except Exception as e:
     raise Exception("Failed to load datasets. Ensure you have an internet connection and the required files.")
 
-# Additional data for carbon intensity by energy type
 carbon_intensity = {
     'energy_source': ['Coal', 'Oil', 'Natural Gas', 'Solar', 'Wind', 'Nuclear', 'Hydroelectric'],
-    'carbon_intensity': [820, 720, 490, 48, 12, 12, 24],  # gCO2/kWh
+    'carbon_intensity': [820, 720, 490, 48, 12, 12, 24],
     'color': ['#333333', '#6b4e2b', '#d5b675', '#ffff00', '#a3e4d7', '#5dade2', '#2e86c1']
 }
 carbon_df = pd.DataFrame(carbon_intensity)
 
-# Data preprocessing
 df = df.fillna(0)
 df['gdp_per_capita'] = np.where(df['population'] != 0, df['gdp'] / df['population'], 0)
 df1['dt'] = pd.to_datetime(df1['dt' if 'dt' in df1.columns else 'Date'])
 
-# Create efficiency metrics
-df['carbon_efficiency'] = np.where(df['gdp'] != 0, df['co2'] / df['gdp'] * 1000000, 0)  # CO2 tons per $1M GDP
-df['energy_efficiency'] = np.where(df['gdp'] != 0, df['primary_energy_consumption'] / df['gdp'] * 1000, 0)  # kWh per $1k GDP
+df['carbon_efficiency'] = np.where(df['gdp'] != 0, df['co2'] / df['gdp'] * 1000000, 0)
+df['energy_efficiency'] = np.where(df['gdp'] != 0, df['primary_energy_consumption'] / df['gdp'] * 1000, 0)
 
 countries = ['United States', 'China', 'Germany', 'India', 'Japan', 'South Korea']
 df_filtered = df1[df1['Country'].isin(countries)].dropna(subset=['AverageTemperature'])
 
 idf = df.interactive()
 
-# Enhanced widgets with more options
 year_slider = pn.widgets.IntSlider(name='Year slider', start=1750, end=2020, step=5, value=1900)
 yaxis_co2 = pn.widgets.RadioButtonGroup(name='Y axis', options=['co2', 'co2_per_capita', 'carbon_efficiency'], button_type='success')
 
-# Add time range slider for trend analysis
 range_slider = pn.widgets.DateRangeSlider(
     name='Time Period',
     start=df1['dt'].min(),
@@ -98,7 +93,6 @@ co2_source_bar_plot = co2_source_bar_pipeline.hvplot(
     kind='bar', x='country', y=yaxis_co2_source, title='CO2 source by continent'
 )
 
-# NEW: Add carbon intensity comparison chart
 carbon_intensity_chart = carbon_df.hvplot.bar(
     x='energy_source', 
     y='carbon_intensity', 
@@ -115,11 +109,10 @@ df_filtered = df_temp[df_temp['Country'].isin(selected_countries)].dropna(subset
 df_filtered['Year'] = df_filtered['dt'].dt.year
 df_grouped = df_filtered.groupby(['Year', 'Country'])['AverageTemperature'].mean().reset_index()
 
-# Create a dedicated country selector for temperature trends
 temp_country_selector = pn.widgets.MultiChoice(
     name='Select Countries',
-    options=selected_countries,  # Use all the tech-heavy countries
-    value=['United States', 'China', 'Germany', 'India', 'Japan', 'South Korea'],  # Default to all countries
+    options=selected_countries,
+    value=['United States', 'China', 'Germany', 'India', 'Japan', 'South Korea'],
     width=300
 )
 
@@ -127,11 +120,9 @@ temp_country_selector = pn.widgets.MultiChoice(
 def update_plot(countries):
     if not countries:
         return pn.pane.Markdown("No countries selected. Please select at least one country.")
-    
     filtered = df_grouped[df_grouped['Country'].isin(countries)]
     if filtered.empty:
         return pn.pane.Markdown("No data available for the selected countries.")
-    
     return filtered.hvplot.line(
         x='Year', 
         y='AverageTemperature', 
@@ -144,7 +135,6 @@ def update_plot(countries):
         line_width=2
     )
 
-# Define metrics dropdown before using it
 metrics_dropdown = pn.widgets.Select(
     name='Select Metric', 
     options=['co2', 'gdp', 'population'], 
@@ -152,7 +142,6 @@ metrics_dropdown = pn.widgets.Select(
     width=200
 )
 
-# Define efficiency dropdown before using it
 efficiency_dropdown = pn.widgets.Select(
     name='Select Efficiency Metric', 
     options=['carbon_efficiency', 'energy_efficiency'], 
@@ -160,21 +149,18 @@ efficiency_dropdown = pn.widgets.Select(
     width=200
 )
 
-# Create a separate country selector for the metrics section
 metrics_country_selector = pn.widgets.MultiChoice(
     name='Select Countries',
     options=df['country'].unique().tolist(),
-    value=['United States'],  # Default selection
+    value=['United States'],
     width=300
 )
 
-# Update the dependent functions to use the metrics_country_selector
 @pn.depends(metrics_country_selector, metrics_dropdown)
 def get_country_metric_plot(selected_countries, metric):
     country_data = df[df['country'].isin(selected_countries)].sort_values('year')
     if country_data.empty:
         return pn.pane.Markdown("No data available for the selected countries.")
-    
     return country_data.hvplot.line(
         x='year',
         y=metric,
@@ -193,7 +179,6 @@ def get_country_efficiency_plot(selected_countries, efficiency_metric):
     country_data = df[df['country'].isin(selected_countries)].sort_values('year')
     if country_data.empty:
         return pn.pane.Markdown("No data available for the selected countries.")
-    
     return country_data.hvplot.line(
         x='year',
         y=efficiency_metric,
@@ -207,7 +192,6 @@ def get_country_efficiency_plot(selected_countries, efficiency_metric):
         hover_cols=['country', 'year']
     )
 
-# Define temperature_text before using it
 temperature_text = pn.pane.Markdown("""
 ### The Climate Cost of Innovation
 
@@ -218,14 +202,12 @@ Select countries from the dropdown to compare how average temperatures have chan
 This visualization helps us understand if there's a correlation between technological advancement and climate impact over the decades.
 """)
 
-# Define tech_adoption_df before using it
 tech_adoption_data = {
     'country': ['United States', 'China', 'Germany', 'Japan', 'South Korea', 'India', 'United Kingdom', 'Canada', 'France', 'Australia'],
     'tech_economy_pct_2020': [22.1, 17.8, 15.3, 12.5, 21.6, 8.2, 16.7, 14.9, 13.8, 11.2]
 }
 tech_adoption_df = pd.DataFrame(tech_adoption_data)
 
-# Define get_tech_vs_emissions before using it
 @pn.depends(year_slider)
 def get_tech_vs_emissions(year):
     tech_emissions = df[(df.year == year) & (df.country.isin(tech_adoption_df['country']))].merge(tech_adoption_df, on='country')
@@ -251,7 +233,6 @@ def get_tech_vs_emissions(year):
     """)
     return pn.Column(plot, correlation_text)
 
-# Updated Country Metrics Tab
 country_analysis_tab = pn.Tabs(
     ('Country Metrics', pn.Column(
         pn.Row(
@@ -279,11 +260,10 @@ future_emissions = {
     'Year': future_years,
     'Business as Usual': [36.8, 38.2, 39.7, 41.2, 42.8, 44.5],
     'Green Tech Scenario': [36.8, 35.3, 33.0, 30.1, 26.5, 22.2],
-    'AI Optimized Energy': [36.8, 34.0, 30.5, 27.8, 22.1, 17.6] # NEW: Added scenario
+    'AI Optimized Energy': [36.8, 34.0, 30.5, 27.8, 22.1, 17.6]
 }
 future_df = pd.DataFrame(future_emissions)
 
-# NEW: Enhanced future plot with an additional scenario
 future_plot = pn.pane.HoloViews(
     future_df.hvplot.line(
         x='Year', 
@@ -298,7 +278,6 @@ future_plot = pn.pane.HoloViews(
     )
 )
 
-# NEW: Interactive scenario builder
 class ScenarioBuilder(param.Parameterized):
     ai_adoption_rate = param.Number(0.5, bounds=(0.0, 1.0), step=0.1)
     renewable_adoption_rate = param.Number(0.3, bounds=(0.0, 1.0), step=0.1)
@@ -311,20 +290,13 @@ class ScenarioBuilder(param.Parameterized):
     def build_scenario(self):
         base = future_df['Business as Usual'].values
         green = future_df['Green Tech Scenario'].values
-        
-        # Calculate custom scenario based on parameters
-        custom_reductions = (self.ai_adoption_rate * 0.3 + 
-                            self.renewable_adoption_rate * 0.5 + 
-                            self.efficiency_improvement * 0.2)
-        
+        custom_reductions = (self.ai_adoption_rate * 0.3 + self.renewable_adoption_rate * 0.5 + self.efficiency_improvement * 0.2)
         scenario = base * (1 - custom_reductions * np.linspace(0, 1, len(base)))
-        
         scenario_df = pd.DataFrame({
             'Year': future_years,
             'Business as Usual': base,
             'Your Custom Scenario': scenario
         })
-        
         return scenario_df.hvplot.line(
             x='Year',
             y=['Business as Usual', 'Your Custom Scenario'],
@@ -381,7 +353,6 @@ try:
 except Exception:
     climate_day_image = pn.pane.Markdown("## 🌍 Climate Dashboard\n\n(Image not found. Please place climate_day.png in the same folder as this script)")
 
-# NEW: Add climate policy effectiveness visualization
 policy_data = {
     'Policy Type': ['Carbon Tax', 'Renewable Subsidies', 'Efficiency Standards', 'R&D Investment', 'Trade Agreements'],
     'Cost Effectiveness': [8.7, 7.2, 6.5, 9.2, 4.8],
@@ -391,25 +362,21 @@ policy_data = {
 }
 policy_df = pd.DataFrame(policy_data)
 
-# Transform for radar chart
 import plotly.graph_objects as go
 from math import pi
 
 def create_radar_chart():
     categories = policy_df.columns[1:].tolist()
     fig = go.Figure()
-    
     for i, policy in enumerate(policy_df['Policy Type']):
         values = policy_df.iloc[i, 1:].tolist()
-        values.append(values[0])  # Close the loop
-        
+        values.append(values[0])
         fig.add_trace(go.Scatterpolar(
             r=values,
             theta=categories + [categories[0]],
             fill='toself',
             name=policy
         ))
-    
     fig.update_layout(
         polar=dict(
             radialaxis=dict(
@@ -420,12 +387,10 @@ def create_radar_chart():
         showlegend=True,
         height=450
     )
-    
     return fig
 
 policy_radar = pn.pane.Plotly(create_radar_chart())
 
-# TABS for different sections
 co2_trends_tab = pn.Tabs(
     ('CO2 Emissions', pn.Column(
         pn.Row(
@@ -525,12 +490,5 @@ template = pn.template.FastListTemplate(
     accent_base_color="#0C5DA5",
     header_background="#0C5DA5",
 )
-<<<<<<< HEAD
-
-
 template.servable()
 pn.serve(template)
-=======
-template.servable()
-pn.serve(template)
->>>>>>> 7ef27d4f (Initial commit)
